@@ -1,14 +1,13 @@
 ﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
-using DSharpPlus.EventArgs;
+using Yard.Commands;
 using Yard.config;
 
 namespace Yard
 {
     internal class Program
     {
-        private static DiscordClient client { get; set; }
-        private static CommandsNextExtension commands { get; set; }
+        private static DiscordClient Client { get; set; }
         
         static async Task Main(string[] args)
         {
@@ -23,9 +22,16 @@ namespace Yard
                 AutoReconnect = true
             };
 
-            client = new DiscordClient(discordConfig);
+            Client = new DiscordClient(discordConfig);
+            var commands = Client.UseCommandsNext(new CommandsNextConfiguration()
+            {
+                StringPrefixes = ["!"]
+            });
 
-            await client.ConnectAsync();
+            commands.RegisterCommands<LeagueOfLegendsCheckCommand>();
+            commands.RegisterCommands<ValorantCheckCommand>();
+
+            await Client.ConnectAsync();
             await Task.Delay(-1);
 
         }
