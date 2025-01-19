@@ -9,8 +9,15 @@ namespace Yard.Commands
         [Command("lolcheck")]
         public async Task LeagueOfLegendsCommand(CommandContext ctx, string region, [RemainingText] string username)
         {
+            //TODO: FIX LIST SHOWING CHAMPIONS PLAYED
             string safeUsername;
-
+            List<string> validServers = new List<string> { "na", "eune", "euw", "me", "ru", "kr", "oce", "jp", "br", "tr", "las", "lan", "tw", "sea", "vn" };
+            
+            if (!validServers.Contains(region.ToLower()))
+            {
+                await ctx.RespondAsync("Invalid region. Please enter a valid server (na, eune, euw, me, ru, kr, oce, jp, br, tr, las, lan, tw, sea, vn).");
+                return;
+            }
 
             if (username.Contains("#"))
             {
@@ -18,7 +25,7 @@ namespace Yard.Commands
             }
             else
             {
-                await ctx.RespondAsync("Invalid username format. Correct format looks like this:!lolcheck region username#riottag");
+                await ctx.RespondAsync("Invalid format. Correct format looks like this:!lolcheck region username#riottag");
                 return;
             }
             string encodedUsername = Uri.EscapeDataString(safeUsername);
@@ -80,8 +87,7 @@ namespace Yard.Commands
                 $"- Tier: {tier}\n" +
                 $"- LP: {lp}\n" +
                 $"- Win-Lose: {winLose}\n" +
-                $"- Ratio: {ratio}\n" +
-                $"- Champions: {champions}");
+                $"- Ratio: {ratio}\n");
                 
         }
     }
