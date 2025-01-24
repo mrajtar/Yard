@@ -9,7 +9,6 @@ namespace Yard.Commands
         [Command("lolcheck")]
         public async Task LeagueOfLegendsCommand(CommandContext ctx, string region, [RemainingText] string username)
         {
-            //TODO: FIX LIST SHOWING CHAMPIONS PLAYED
             string safeUsername;
             List<string> validServers = new List<string> { "na", "eune", "euw", "me", "ru", "kr", "oce", "jp", "br", "tr", "las", "lan", "tw", "sea", "vn" };
             
@@ -36,9 +35,6 @@ namespace Yard.Commands
             string lp = "N/A";
             string winLose = "N/A";
             string ratio = "N/A";
-            string name = "N/A";
-            string kda = "N/A";
-            string gamesPlayed = "N/A";
             var champions = new List<string>();
 
             var document = web.Load($"https://www.op.gg/summoners/{region}/{encodedUsername}");
@@ -63,15 +59,18 @@ namespace Yard.Commands
                     foreach (var box in championBoxes)
                     {
                         var nameNode = box.SelectSingleNode(".//div[contains(@class, 'name')]");
-                        name = nameNode?.InnerText.Trim() ?? "N/A";
+                        string name = nameNode?.InnerText.Trim() ?? "N/A";
 
-                        var kdaNode = box.SelectSingleNode(".//div[contains(@class, 'kda')]");
-                        kda = kdaNode?.InnerText.Trim() ?? "N/A";
+                        var kdaNode = box.SelectSingleNode(".//div[contains(@class, 'ere6j7v2')]");
+                        string kda = kdaNode?.InnerText.Trim() ?? "N/A";
 
-                        var gamesPlayedNode = box.SelectSingleNode(".//div[contains(@class, 'played')]");
-                        gamesPlayed = gamesPlayedNode?.InnerText.Trim() ?? "N/A";
+                        var gamesPlayedNode = box.SelectSingleNode(".//div[contains(@class, 'count')]");
+                        string gamesPlayed = gamesPlayedNode?.InnerText.Trim() ?? "N/A";
 
-                        champions.Add($"{name}: KDA - {kda}, Played - {gamesPlayed}");
+                        var winRateNode = box.SelectSingleNode(".//div[contains(@class, 'ere6j7v3')]");
+                        string winRate = winRateNode?.InnerText.Trim() ?? "N/A";
+
+                        champions.Add($"{name} - {kda} - {gamesPlayed} - {winRate} WR");
                     }
                 }
                 else
@@ -87,8 +86,9 @@ namespace Yard.Commands
                 $"- Tier: {tier}\n" +
                 $"- LP: {lp}\n" +
                 $"- Win-Lose: {winLose}\n" +
-                $"- Ratio: {ratio}\n");
-                
+                $"- Ratio: {ratio}\n" +
+                "Champions played:\n" + 
+                string.Join(Environment.NewLine, champions));
         }
     }
 }
