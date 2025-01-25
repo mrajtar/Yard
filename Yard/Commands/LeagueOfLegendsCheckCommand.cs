@@ -82,7 +82,7 @@ namespace Yard.Commands
             {
                 Console.WriteLine("Parent node not found.");
             }
-            await ctx.RespondAsync($"Current statistics for {encodedUsername}:\n" +
+            await ctx.RespondAsync($"Current statistics for {username}:\n" +
                 $"- Tier: {tier}\n" +
                 $"- LP: {lp}\n" +
                 $"- Win-Lose: {winLose}\n" +
