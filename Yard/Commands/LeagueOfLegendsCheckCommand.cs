@@ -6,7 +6,7 @@ namespace Yard.Commands
 {
     public class LeagueOfLegendsCheckCommand : BaseCommandModule
     {
-        [Command("lolcheck")]
+        [Command("lol")]
         public async Task LeagueOfLegendsCommand(CommandContext ctx, string region, [RemainingText] string username)
         {
             string safeUsername;
@@ -24,7 +24,7 @@ namespace Yard.Commands
             }
             else
             {
-                await ctx.RespondAsync("Invalid format. Correct format looks like this:!lolcheck region username#riottag");
+                await ctx.RespondAsync("Invalid format. Correct format looks like this:!lol region username#riottag");
                 return;
             }
             string encodedUsername = Uri.EscapeDataString(safeUsername);
