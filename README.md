@@ -1,5 +1,9 @@
 # Yard
-C# Discord bot created with DSharpPlus & HtmlAgilityPack that web scrapes info like current ranked tier, lp, winratio and such for any given player. For league of legends works for all regions except china.
+C# Discord bot created with DSharpPlus, HtmlAgilityPack & Selenium that web scrapes info like current ranked tier, lp, winratio and such for any given player for Valorant and League of Legends. For LoL works for all regions except china.
 Example of a query and the response for a LoL account:
 
-![Zrzut ekranu 2025-01-24 034950](https://github.com/user-attachments/assets/5167fdb5-b5d6-4b40-b2f9-567a277d70a2)
+![lolcommand](https://github.com/user-attachments/assets/150953f3-2721-4827-96fe-162c037f3c9e)
+
+Example for a Valorant account:
+
+![vlrcommand](https://github.com/user-attachments/assets/5ac99861-d680-4e39-8575-5450e4ae013f)
