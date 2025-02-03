@@ -44,7 +44,7 @@ internal class LeagueOfLegendsCheckCommand : BaseCommandModule
             {
                 stats.Tier = parentNode.SelectSingleNode(".//div[contains(@class, 'tier')]")?.InnerText.Trim() ??"N/A";
 
-                stats.LeaguePoints =parentNode.SelectSingleNode(".//div[contains(@class, 'lp')]")?.InnerText.Trim() ?? "N/A";
+                stats.LeaguePoints = parentNode.SelectSingleNode(".//div[contains(@class, 'lp')]")?.InnerText.Trim() ?? "N/A";
 
                 stats.WinPercentage = parentNode.SelectSingleNode(".//div[contains(concat(' ', @class, ' '), ' win-lose ')]")?.InnerText.Trim() ?? "N/A";
 
@@ -91,8 +91,7 @@ internal class LeagueOfLegendsCheckCommand : BaseCommandModule
         if (stats.Champions.Count != 0)
             embed.AddField("Most played champions", string.Join(Environment.NewLine, stats.Champions));
 
-        if (stats.Tier == "N/A" && stats is
-                { LeaguePoints: "N/A", WinsAndLosses: "N/A", WinPercentage: "N/A", Champions: null })
+        if (stats.Tier == "N/A" && stats is { LeaguePoints: "N/A", WinsAndLosses: "N/A", WinPercentage: "N/A", Champions: null })
         {
             await ctx.RespondAsync($"No data found for summoner {username} in {region.ToUpper()}." +
                                    $" Check for typos in username/region or the user has not played any ranked games this split.");

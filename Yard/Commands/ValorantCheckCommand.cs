@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using DSharpPlus.CommandsNext;
+﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using OpenQA.Selenium;
@@ -9,9 +8,6 @@ using Yard.Models;
 
 namespace Yard.Commands
 {
-    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
-    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
-    [SuppressMessage("ReSharper", "ConditionalAccessQualifierIsNonNullableAccordingToAPIContract")]
     internal class ValorantCheckCommand : BaseCommandModule
     {
         [Command("vlr")]
@@ -48,8 +44,26 @@ namespace Yard.Commands
                 var stats = new ValorantPlayerStatistics();
                 if (parentNode != null)
                 {
-                    stats.Rank = parentNode.FindElement(By.XPath(
-                        ".//div[contains(@class, 'stat')][span[@class='stat__label' and text()='Rating']]/span[@class='stat__value']"))?.Text.Trim() ?? "N/A";
+                    var rankElement = parentNode.FindElements(By.XPath(".//div[contains(@class, 'stat')]"));
+                    foreach (var stat in rankElement)
+                    {
+                        var labelElement = stat.FindElement(By.XPath(".//span[@class='stat__label']"));
+                        var valueElement = stat.FindElement(By.XPath(".//span[@class='stat__value']"));
+
+                        if (labelElement.Text.Trim() == "Rating")
+                        {
+                            stats.Rank = valueElement.Text.Trim();
+                            break;
+                        }
+
+                        if (labelElement.Text.Trim() != "Radiant" && !labelElement.Text.Trim().Contains("Immortal"))
+                            continue;
+                        var subtextElement = stat.FindElements(By.XPath(".//span[@class='stat__subtext']"));
+                        string subtext = subtextElement.Count > 0 ? $" ({subtextElement[0].Text.Trim()})" : "";
+                        stats.Rank = $"{labelElement.Text.Trim()} {valueElement.Text.Trim()}{subtext}";
+                        break;
+                    }
+                    
                     stats.WinPercentage = parentNode.FindElement(By.XPath(
                         "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='Win %']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
                     stats.KDRatio = parentNode.FindElement(By.XPath(
@@ -82,7 +96,7 @@ namespace Yard.Commands
                 embed.AddField("Losses", stats.Losses, true);
                 embed.AddField("ADR", stats.AverageDamagePerRound, true);
                 embed.AddField("KAST", stats.KAST, true);
-                embed.AddField("Head Shot", stats.HeadShotPercentage, true);
+                embed.AddField("Head Shot", stats.HeadShotPercentage);
                 await ctx.RespondAsync(embed);
             }
             catch (NoSuchElementException)
