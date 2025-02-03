@@ -1,4 +1,5 @@
-﻿using DSharpPlus.CommandsNext;
+﻿using System.Diagnostics.CodeAnalysis;
+using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using OpenQA.Selenium;
@@ -8,7 +9,10 @@ using Yard.Models;
 
 namespace Yard.Commands
 {
-    public class ValorantCheckCommand : BaseCommandModule
+    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract")]
+    [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
+    [SuppressMessage("ReSharper", "ConditionalAccessQualifierIsNonNullableAccordingToAPIContract")]
+    internal class ValorantCheckCommand : BaseCommandModule
     {
         [Command("vlr")]
         public async Task ValorantCommand(CommandContext ctx, [RemainingText] string username)
@@ -60,6 +64,10 @@ namespace Yard.Commands
                         "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='KAST']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
                     stats.HeadShotPercentage = parentNode.FindElement(By.XPath(
                         "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='Headshot %']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
+                }
+                else
+                {
+                    await Console.Out.WriteLineAsync("No parent node found.");
                 }
 
                 var embed = new DiscordEmbedBuilder
