@@ -31,7 +31,7 @@ namespace Yard
             });
 
             commands.RegisterCommands<LeagueOfLegendsCheckCommand>();
-            //commands.RegisterCommands<ValorantCheckCommand>();
+            commands.RegisterCommands<ValorantCheckCommand>();
 
             await Client.ConnectAsync();
             await Task.Delay(-1);
