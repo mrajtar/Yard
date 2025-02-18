@@ -78,6 +78,23 @@ internal class LeagueOfLegendsCheckCommand : BaseCommandModule
             await Console.Out.WriteLineAsync($"Error fetching data: {ex.Message}");
         }
 
+        var embed = EmbedBuilderForLeagueOfLegends.BuildDiscordEmbed(region, username, stats);
+
+        if (stats.Tier == "N/A" && stats is { LeaguePoints: "N/A", WinsAndLosses: "N/A", WinPercentage: "N/A", Champions: null })
+        {
+            await ctx.RespondAsync($"No data found for summoner {username} in {region.ToUpper()}." +
+                                   $" Check for typos in username/region or the user has not played any ranked games this split.");
+            return;
+        }
+
+        await ctx.RespondAsync(embed);
+    }
+}
+
+internal static class EmbedBuilderForLeagueOfLegends
+{
+    public static DiscordEmbed BuildDiscordEmbed(string region, string username, LeagueOfLegendsPlayerStatistics stats)
+    {
         var embed = new DiscordEmbedBuilder
         {
             Title = $"Statistics for {username}",
@@ -90,14 +107,6 @@ internal class LeagueOfLegendsCheckCommand : BaseCommandModule
         embed.AddField("Win-Lose", stats.WinPercentage, true);
         if (stats.Champions.Count != 0)
             embed.AddField("Most played champions", string.Join(Environment.NewLine, stats.Champions));
-
-        if (stats.Tier == "N/A" && stats is { LeaguePoints: "N/A", WinsAndLosses: "N/A", WinPercentage: "N/A", Champions: null })
-        {
-            await ctx.RespondAsync($"No data found for summoner {username} in {region.ToUpper()}." +
-                                   $" Check for typos in username/region or the user has not played any ranked games this split.");
-            return;
-        }
-
-        await ctx.RespondAsync(embed);
+        return embed.Build();
     }
 }

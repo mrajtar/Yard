@@ -3,6 +3,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.DevTools.V132.Network;
 using OpenQA.Selenium.Support.UI;
 using Yard.Models;
 
@@ -59,7 +60,7 @@ namespace Yard.Commands
                         if (labelElement.Text.Trim() != "Radiant" && !labelElement.Text.Trim().Contains("Immortal"))
                             continue;
                         var subtextElement = stat.FindElements(By.XPath(".//span[@class='stat__subtext']"));
-                        string subtext = subtextElement.Count > 0 ? $" ({subtextElement[0].Text.Trim()})" : "";
+                        string subtext = subtextElement.Count > 0 ? $" ({subtextElement[0].Text.Trim()})" : string.Empty;
                         stats.Rank = $"{labelElement.Text.Trim()} {valueElement.Text.Trim()}{subtext}";
                         break;
                     }
@@ -78,25 +79,16 @@ namespace Yard.Commands
                         "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='KAST']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
                     stats.HeadShotPercentage = parentNode.FindElement(By.XPath(
                         "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='Headshot %']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
+
+                    var agentBoxes = parentNode.FindElements(By.XPath(
+                        "//div[@class, 'st-content__category']"));
                 }
                 else
                 {
                     await Console.Out.WriteLineAsync("No parent node found.");
                 }
 
-                var embed = new DiscordEmbedBuilder
-                {
-                    Title = $"Statistics for {username}",
-                    Color = DiscordColor.Purple
-                };
-                embed.AddField("Rank", stats.Rank, true);
-                embed.AddField("Win %", stats.WinPercentage, true);
-                embed.AddField("K/D", stats.KDRatio, true);
-                embed.AddField("Wins", stats.Wins, true);
-                embed.AddField("Losses", stats.Losses, true);
-                embed.AddField("ADR", stats.AverageDamagePerRound, true);
-                embed.AddField("KAST", stats.KAST, true);
-                embed.AddField("Head Shot", stats.HeadShotPercentage);
+                var embed = EmbedBuilderForValorant.BuildDiscordEmbed(username, stats);
                 await ctx.RespondAsync(embed);
             }
             catch (NoSuchElementException)
@@ -108,5 +100,27 @@ namespace Yard.Commands
                 driver.Quit();
             }
         }
-    } 
+    }
+
+    internal static class EmbedBuilderForValorant
+    {
+        public static DiscordEmbed BuildDiscordEmbed(string username, ValorantPlayerStatistics stats)
+        {
+            var embed = new DiscordEmbedBuilder
+            {
+                Title = $"Statistics for {username}",
+                Color = DiscordColor.Purple
+            };
+            embed.AddField("Rank", stats.Rank, true);
+            embed.AddField("Win %", stats.WinPercentage, true);
+            embed.AddField("K/D", stats.KDRatio, true);
+            embed.AddField("Wins", stats.Wins, true);
+            embed.AddField("Losses", stats.Losses, true);
+            embed.AddField("ADR", stats.AverageDamagePerRound, true);
+            embed.AddField("KAST", stats.KAST, true);
+            embed.AddField("HS %", stats.HeadShotPercentage);
+            
+            return embed.Build();
+        }
+    }
 }
