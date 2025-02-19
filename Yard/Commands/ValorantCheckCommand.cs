@@ -3,7 +3,6 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.DevTools.V132.Network;
 using OpenQA.Selenium.Support.UI;
 using Yard.Models;
 
@@ -79,9 +78,6 @@ namespace Yard.Commands
                         "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='KAST']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
                     stats.HeadShotPercentage = parentNode.FindElement(By.XPath(
                         "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='Headshot %']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
-
-                    var agentBoxes = parentNode.FindElements(By.XPath(
-                        "//div[@class, 'st-content__category']"));
                 }
                 else
                 {
@@ -119,7 +115,6 @@ namespace Yard.Commands
             embed.AddField("ADR", stats.AverageDamagePerRound, true);
             embed.AddField("KAST", stats.KAST, true);
             embed.AddField("HS %", stats.HeadShotPercentage);
-            
             return embed.Build();
         }
     }

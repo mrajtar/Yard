@@ -10,6 +10,5 @@
         public string? WinPercentage { get; set; } = "N/A";
         public string? HeadShotPercentage { get; set; } = "N/A";
         public string? KAST { get; set; } = "N/A";
-        public List<string> Agents { get; set; } = [];
     }
 }

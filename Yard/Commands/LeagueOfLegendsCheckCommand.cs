@@ -8,37 +8,36 @@ namespace Yard.Commands;
 
 internal class LeagueOfLegendsCheckCommand : BaseCommandModule
 {
-    private static readonly List<string> ValidServers =
-        ["na", "eune", "euw", "me", "ru", "kr", "oce", "jp", "br", "tr", "las", "lan", "tw", "sea", "vn"];
-
     [Command("lol")]
     public async Task LeagueOfLegendsCommand(CommandContext ctx, string region, [RemainingText] string username)
     {
         string safeUsername;
-        if (!ValidServers.Contains(region.ToLower()))
+        if (!InputValidatorForLeagueOfLegends.IsValidRegion(region))
         {
             await ctx.RespondAsync("Invalid region. Please enter a valid server (na, eune, euw, me, ru, kr, oce, jp, br, tr, las, lan, tw, sea, vn).");
             return;
         }
 
-        if (username.Contains('#'))
+        if (InputValidatorForLeagueOfLegends.IsValidUsername(username))
         {
             safeUsername = username.Replace("#", "-");
         }
         else
         {
-            await ctx.RespondAsync("Invalid format. Correct format looks like this:!lol region username#riottag");
+            await ctx.RespondAsync("Invalid format. Correct format looks like this:!lol region username#tag");
             return;
         }
 
         var encodedUsername = Uri.EscapeDataString(safeUsername);
-        var web = new HtmlWeb();
-        web.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+        var web = new HtmlWeb
+        {
+            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        };
 
         var stats = new LeagueOfLegendsPlayerStatistics();
         try
         {
-            var document = web.Load($"https://www.op.gg/summoners/{region}/{encodedUsername}");
+            var document = await web.LoadFromWebAsync($"https://www.op.gg/summoners/{region}/{encodedUsername}");
             var parentNode = document.DocumentNode.SelectSingleNode("//div[@id='content-container']");
             if (parentNode != null)
             {
@@ -80,7 +79,7 @@ internal class LeagueOfLegendsCheckCommand : BaseCommandModule
 
         var embed = EmbedBuilderForLeagueOfLegends.BuildDiscordEmbed(region, username, stats);
 
-        if (stats.Tier == "N/A" && stats is { LeaguePoints: "N/A", WinsAndLosses: "N/A", WinPercentage: "N/A", Champions: null })
+        if (stats is { Tier: "N/A", LeaguePoints: "N/A", WinsAndLosses: "N/A", WinPercentage: "N/A", Champions: null })
         {
             await ctx.RespondAsync($"No data found for summoner {username} in {region.ToUpper()}." +
                                    $" Check for typos in username/region or the user has not played any ranked games this split.");
@@ -105,8 +104,18 @@ internal static class EmbedBuilderForLeagueOfLegends
         embed.AddField("LP", stats.LeaguePoints, true);
         embed.AddField("Win %", stats.WinsAndLosses, true);
         embed.AddField("Win-Lose", stats.WinPercentage, true);
-        if (stats.Champions.Count != 0)
+        if (stats.Champions.Count > 0)
             embed.AddField("Most played champions", string.Join(Environment.NewLine, stats.Champions));
         return embed.Build();
     }
+}
+
+internal static class InputValidatorForLeagueOfLegends
+{
+    private static readonly HashSet<string> ValidRegions =
+        ["na", "eune", "euw", "me", "ru", "kr", "oce", "jp", "br", "tr", "las", "lan", "tw", "sea", "vn"];
+
+    public static bool IsValidRegion(string region) => ValidRegions.Contains(region.ToLower());
+
+    public static bool IsValidUsername(string username) => username.Contains('#');
 }
