@@ -42,47 +42,44 @@ namespace Yard.Commands
 
                 var parentNode = wait.Until(drv => drv.FindElement(By.XPath("//div[contains(@class, 'area-main-stats')]")));
                 var stats = new ValorantPlayerStatistics();
-                if (parentNode != null)
+                if (parentNode == null)
+                    await Console.Out.WriteLineAsync("No parent node found.");
+                
+                var rankElement = parentNode.FindElements(By.XPath(".//div[contains(@class, 'stat')]"));
+                foreach (var stat in rankElement)
                 {
-                    var rankElement = parentNode.FindElements(By.XPath(".//div[contains(@class, 'stat')]"));
-                    foreach (var stat in rankElement)
+                    var labelElement = stat.FindElement(By.XPath(".//span[@class='stat__label']"));
+                    var valueElement = stat.FindElement(By.XPath(".//span[@class='stat__value']"));
+
+                    if (labelElement.Text.Trim() == "Rating")
                     {
-                        var labelElement = stat.FindElement(By.XPath(".//span[@class='stat__label']"));
-                        var valueElement = stat.FindElement(By.XPath(".//span[@class='stat__value']"));
-
-                        if (labelElement.Text.Trim() == "Rating")
-                        {
-                            stats.Rank = valueElement.Text.Trim();
-                            break;
-                        }
-
-                        if (labelElement.Text.Trim() != "Radiant" && !labelElement.Text.Trim().Contains("Immortal"))
-                            continue;
-                        var subtextElement = stat.FindElements(By.XPath(".//span[@class='stat__subtext']"));
-                        string subtext = subtextElement.Count > 0 ? $" ({subtextElement[0].Text.Trim()})" : string.Empty;
-                        stats.Rank = $"{labelElement.Text.Trim()} {valueElement.Text.Trim()}{subtext}";
+                        stats.Rank = valueElement.Text.Trim();
                         break;
                     }
+
+                    if (labelElement.Text.Trim() != "Radiant" && !labelElement.Text.Trim().Contains("Immortal"))
+                        continue;
+                    var subtextElement = stat.FindElements(By.XPath(".//span[@class='stat__subtext']"));
+                    string subtext = subtextElement.Count > 0 ? $" ({subtextElement[0].Text.Trim()})" : string.Empty;
+                    stats.Rank = $"{labelElement.Text.Trim()} {valueElement.Text.Trim()}{subtext}";
+                    break;
+                }
                     
-                    stats.WinPercentage = parentNode.FindElement(By.XPath(
-                        "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='Win %']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
-                    stats.KDRatio = parentNode.FindElement(By.XPath(
-                        "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='K/D Ratio']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
-                    stats.Wins = parentNode.FindElement(By.XPath(
-                        ".//*[local-name()='text' and @text-anchor='middle' and @fill='#fff'][1]"))?.Text.Trim() ?? "N/A";
-                    stats.Losses = parentNode.FindElement(By.XPath(
-                        ".//*[local-name()='text' and @text-anchor='middle' and @fill='#fff'][2]"))?.Text.Trim() ?? "N/A";
-                    stats.AverageDamagePerRound = parentNode.FindElement(By.XPath(
-                        "//div[contains(@class, 'stat')][.//span[@class='name' and text()='Damage/Round']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
-                    stats.KAST = parentNode.FindElement(By.XPath(
-                        "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='KAST']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
-                    stats.HeadShotPercentage = parentNode.FindElement(By.XPath(
-                        "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='Headshot %']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
-                }
-                else
-                {
-                    await Console.Out.WriteLineAsync("No parent node found.");
-                }
+                stats.WinPercentage = parentNode.FindElement(By.XPath(
+                    "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='Win %']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
+                stats.KDRatio = parentNode.FindElement(By.XPath(
+                    "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='K/D Ratio']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
+                stats.Wins = parentNode.FindElement(By.XPath(
+                    ".//*[local-name()='text' and @text-anchor='middle' and @fill='#fff'][1]"))?.Text.Trim() ?? "N/A";
+                stats.Losses = parentNode.FindElement(By.XPath(
+                    ".//*[local-name()='text' and @text-anchor='middle' and @fill='#fff'][2]"))?.Text.Trim() ?? "N/A";
+                stats.AverageDamagePerRound = parentNode.FindElement(By.XPath(
+                    "//div[contains(@class, 'stat')][.//span[@class='name' and text()='Damage/Round']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
+                stats.KAST = parentNode.FindElement(By.XPath(
+                    "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='KAST']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
+                stats.HeadShotPercentage = parentNode.FindElement(By.XPath(
+                    "//div[contains(@class, 'numbers')][.//span[@class='name' and text()='Headshot %']]//span[@class='value']"))?.Text.Trim() ?? "N/A";
+                
 
                 var embed = EmbedBuilderForValorant.BuildDiscordEmbed(username, stats);
                 await ctx.RespondAsync(embed);

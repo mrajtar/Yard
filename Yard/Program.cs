@@ -12,12 +12,12 @@ namespace Yard
         static async Task Main(string[] args)
         {
             var jsonReader = new JSONReader();
-            await jsonReader.ReadJSON();
+            var data = await jsonReader.ReadJSON();
 
             var discordConfig = new DiscordConfiguration()
             {
                 Intents = DiscordIntents.All,
-                Token = jsonReader.token,
+                Token = data.token,
                 TokenType = TokenType.Bot,
                 AutoReconnect = true
             };
@@ -25,7 +25,7 @@ namespace Yard
             Client = new DiscordClient(discordConfig);
             var commands = Client.UseCommandsNext(new CommandsNextConfiguration()
             {
-                StringPrefixes = [jsonReader.prefix],
+                StringPrefixes = [data.prefix],
                 EnableMentionPrefix = true,
                 EnableDefaultHelp = false
             });
