@@ -48,20 +48,19 @@ namespace Yard.Commands
                 var rankElement = parentNode.FindElements(By.XPath(".//div[contains(@class, 'stat')]"));
                 foreach (var stat in rankElement)
                 {
-                    var labelElement = stat.FindElement(By.XPath(".//span[@class='stat__label']"));
-                    var valueElement = stat.FindElement(By.XPath(".//span[@class='stat__value']"));
+                    var labelElement = stat.FindElement(By.XPath(".//span[@class='stat__label']"))?.Text.Trim() ?? "N/A";
+                    var valueElement = stat.FindElement(By.XPath(".//span[@class='stat__value']"))?.Text.Trim() ?? "N/A";
 
-                    if (labelElement.Text.Trim() == "Rating")
+                    if (labelElement.Trim() == "Rating")
                     {
-                        stats.Rank = valueElement.Text.Trim();
+                        stats.Rank = valueElement.Trim();
                         break;
                     }
 
-                    if (labelElement.Text.Trim() != "Radiant" && !labelElement.Text.Trim().Contains("Immortal"))
+                    if (labelElement.Trim() != "Radiant" && !labelElement.Trim().Contains("Immortal"))
                         continue;
-                    var subtextElement = stat.FindElements(By.XPath(".//span[@class='stat__subtext']"));
-                    string subtext = subtextElement.Count > 0 ? $" ({subtextElement[0].Text.Trim()})" : string.Empty;
-                    stats.Rank = $"{labelElement.Text.Trim()} {valueElement.Text.Trim()}{subtext}";
+                    var subtextElement = stat.FindElement(By.XPath(".//span[@class='stat__subtext']"))?.Text.Trim() ?? "N/A";;
+                    stats.Rank = $"{labelElement} {valueElement} {subtextElement}";
                     break;
                 }
                     
