@@ -20,6 +20,7 @@ namespace Yard
             var services = new ServiceCollection();
 
             services.AddSingleton<LeagueOfLegendsScraper>();
+            services.AddSingleton<ValorantScraper>();
 
             var serviceProvider = services.BuildServiceProvider();
 
