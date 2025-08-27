@@ -2,13 +2,13 @@
 {
     public class ValorantPlayerStatistics
     {
-        public string? Rank { get; set; } = "N/A";
-        public string? KDRatio { get; set; } = "N/A";
-        public string? AverageDamagePerRound { get; set; } = "N/A";
-        public string? Wins { get; set; } = "N/A";
-        public string? Losses { get; set; } = "N/A";
-        public string? WinPercentage { get; set; } = "N/A";
-        public string? HeadShotPercentage { get; set; } = "N/A";
-        public string? KAST { get; set; } = "N/A";
+        public string? Rank { get; set; }
+        public string? KDRatio { get; set; }
+        public string? AverageDamagePerRound { get; set; }
+        public string? Wins { get; set; }
+        public string? Losses { get; set; }
+        public string? WinPercentage { get; set; }
+        public string? HeadShotPercentage { get; set; }
+        public string? KAST { get; set; }
     }
 }

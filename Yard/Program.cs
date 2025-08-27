@@ -1,7 +1,10 @@
 ﻿using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using Yard.Commands;
 using Yard.config;
+using Yard.Services;
 
 namespace Yard
 {
@@ -13,6 +16,12 @@ namespace Yard
         {
             var jsonReader = new JSONReader();
             var data = await jsonReader.ReadJSON();
+
+            var services = new ServiceCollection();
+
+            services.AddSingleton<LeagueOfLegendsScraper>();
+
+            var serviceProvider = services.BuildServiceProvider();
 
             var discordConfig = new DiscordConfiguration()
             {
@@ -27,7 +36,8 @@ namespace Yard
             {
                 StringPrefixes = [data.prefix],
                 EnableMentionPrefix = true,
-                EnableDefaultHelp = false
+                EnableDefaultHelp = false,
+                Services = serviceProvider
             });
 
             commands.RegisterCommands<LeagueOfLegendsCheckCommand>();
